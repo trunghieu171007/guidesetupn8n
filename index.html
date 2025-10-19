@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hướng dẫn Self-host n8n (Docker) — Cloudflare Tunnel</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <meta name="description" content="Hướng dẫn ngắn gọn để self-host n8n bằng Docker và kết nối an toàn qua Cloudflare Tunnel.">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#">TIRAMISU.IO.VN</a>
+        <nav class="nav">
+          <a href="#intro">Giới thiệu</a>
+          <a href="#prereq">Tiền đề</a>
+          <a href="#steps">Các bước</a>
+          <a href="#resources">Tài nguyên</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="intro" class="hero container">
+        <div class="hero-left">
+          <h1>HƯỚNG DẪN SELFHOST N8N VỚI CLOUDFLARE TUNNEL</h1>
+          <p class="lead">Chạy n8n trên Docker và kết nối qua Cloudflare Tunnel để không phải mở port public. Hướng dẫn ngắn, có ví dụ Docker Compose và lệnh cloudflared.</p>
+          <!-- <p><a class="btn" href="#steps">Xem các bước</a></p> -->
+        </div>
+        <div class="hero-image">
+          <img src="/img/n8n.png" alt="server"/>
+        </div>
+      </section>
+
+      <section id="prereq" class="section container">
+        <h2>MỞ ĐẦU</h2>
+        <ul>
+          <li>VPS hoặc máy chủ có Docker & Docker Compose</li>
+          <li>Tên miền quản lý trên Cloudflare</li>
+          <li>Tài khoản Cloudflare (Zero Trust) để tạo Tunnel</li>
+        </ul>
+      </section>
+
+      <section id="steps" class="section container">
+        <h2>HƯỚNG DẪN SELFHOST N8N </h2>
+
+        <h3>1) Docker Compose (n8n)</h3>
+        <p>Sao chép file <code>docker-compose.yml</code> sau vào thư mục trên máy chủ và chạy <code>docker compose up -d</code>:</p>
+        <pre><code class="code">version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - N8N_PORT=5678
+      - N8N_HOST=127.0.0.1
+      - GENERIC_TIMEZONE=UTC
+    ports:
+      - "127.0.0.1:5678:5678"
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+    networks:
+      - internal
+
+networks:
+  internal:
+    internal: true</code></pre>
+
+        <h3>2) Cài và chạy Cloudflared (Tunnel)</h3>
+        <p>Trên máy chủ, cài <code>cloudflared</code> theo hướng dẫn Cloudflare, sau đó:</p>
+        <pre><code class="code"># Đăng nhập vào Cloudflare Zero Trust (mở trình duyệt)
+cloudflared tunnel login
+
+# Tạo tunnel
+cloudflared tunnel create n8n-tunnel
+
+# Tạo route hostname (vd: n8n.example.com) trong dashboard hoặc dùng config
+
+# Chạy tunnel trỏ tới n8n
+cloudflared tunnel run n8n-tunnel --url http://localhost:5678</code></pre>
+
+        <figure class="figure">
+          <img src="https://isplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80" alt="cloud"/>
+          <figcaption>Cloudflare Tunnel giúp kết nối an toàn từ Cloud tới ứng dụng nội bộ.</figcaption>
+        </figure>
+
+        <h3>3) Bảo mật thêm</h3>
+        <ul>
+          <li>Sử dụng Cloudflare Access (Zero Trust) để yêu cầu xác thực.</li>
+          <li>Bật backups cho thư mục <code>./n8n-data</code>.</li>
+          <li>Không expose n8n trực tiếp ra public; chỉ dùng loopback + Tunnel.</li>
+        </ul>
+      </section>
+
+      <section id="resources" class="section container">
+        <h2>Tài nguyên & Mẹo</h2>
+        <ul>
+          <li><a href="https://docs.n8n.io/" target="_blank">Tài liệu n8n</a></li>
+          <li><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/" target="_blank">Cloudflare Tunnel docs</a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Trang đơn giản — kiểm tra kỹ trước khi dùng trên production.</p>
+      </div>
+    </footer>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>

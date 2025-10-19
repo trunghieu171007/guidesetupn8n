@@ -1,0 +1,46 @@
+:root{
+  --bg:#ffffff;
+  --text:#0b1220;
+  --muted:#4b5563;
+  --accent:#2563eb;
+  --card:#f8fafc;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#f1f5f9;color:var(--text);line-height:1.5}
+.container{width:92%;max-width:980px;margin:0 auto;padding:28px 0}
+.site-header{background:transparent;padding:18px 0}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;color:var(--accent);text-decoration:none;font-size:1.1rem}
+.nav a{color:var(--muted);text-decoration:none;margin-left:18px}
+.nav a:hover{color:var(--text)}
+
+.hero{display:flex;gap:20px;align-items:center}
+.hero-left{flex:1}
+.hero-image{width:40%;border-radius:12px;overflow:hidden}
+.hero-image img{width:100%;height:auto;display:block}
+.hero h1{margin:0 0 8px 0;font-size:1.8rem}
+.lead{color:var(--muted)}
+.btn{display:inline-block;padding:8px 12px;border-radius:10px;background:var(--accent);color:white;text-decoration:none}
+
+.section{background:var(--card);border-radius:12px;padding:18px;margin-top:18px}
+.section h2{margin-top:0}
+.section ul{margin:8px 0 0 20px}
+
+.figure{margin:12px 0}
+.figure img{width:100%;border-radius:8px}
+.figure figcaption{color:var(--muted);font-size:0.95rem;margin-top:6px}
+
+.code{display:block;background:#0b1220;color:#e6eef8;padding:12px;border-radius:8px;overflow:auto;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;position:relative}
+.code .copy-btn{position:absolute;right:10px;top:10px;background:rgba(255,255,255,0.06);border:0;color:#e6eef8;padding:6px 8px;border-radius:6px;cursor:pointer}
+
+.site-footer{padding:24px 0;color:var(--muted);text-align:center}
+
+@media (max-width:900px){
+  .hero{flex-direction:column}
+  .hero-image{width:100%}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important}
+}
